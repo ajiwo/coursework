@@ -5,8 +5,10 @@ words = []
 
 while run
   word = gets.chomp
-  words.push word
-  if word.length == 0
+
+  if word.length > 0
+    words.push word
+  else
     run = false
   end
 end
