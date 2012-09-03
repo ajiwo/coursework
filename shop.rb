@@ -1,4 +1,4 @@
-# pawn shop
+# pawn shop, with discounts
 
 # use the following cheat
 # *  Array.delete_at
@@ -96,8 +96,38 @@ def listBasket basket
   contents
 end
 
-# get total cost from a basket contents
-def getTotalCost basket
+# item based discount
+def getPairedItemDiscount(basket, item1, item2, discount)
+  found = []
+  prices = []
+  discounts = []
+  basket.each do |item|
+    if item[0] == item1
+      found.push true
+      prices.push item[2]
+    elsif item[0] == item2
+      found.push true
+      prices.push item[2]
+    end
+  end
+  if found[0] and found[1]
+    discounts[0] = discount * prices[0]
+    discounts[1] = discount * prices[1]
+    return discounts[0] + discounts[1]
+  end
+  0
+end
+
+# quantity based discount
+def getQtyDiscount(basket, price, discount)
+  if basket.length > 2
+    return price * discount
+  end
+  0
+end
+
+# get total price from a basket contents
+def getTotalPrice basket
   total = 0
   basket.each do |item|
     total = total + item[2]
@@ -105,12 +135,20 @@ def getTotalCost basket
   total
 end
 
-# summary of basket contents and sum of cost
+# summary of basket contents and sum of price
 def basketSummary basket
   contentStr = listBasket basket
-  totalCost = getTotalCost basket
+  totalPrice = getTotalPrice basket
+  disc1 = getPairedItemDiscount(basket, 1, 3, 0.10)
+  disc2 = getQtyDiscount(basket, totalPrice, 0.05)
+  disc = disc1 + disc2
+  discStr = ''
+  if disc > 0
+    discStr = "\ndiscount: $#{disc}"
+    totalPrice = totalPrice - disc
+  end
   # todo discount ?
-  "#{contentStr}\nTotal cost: $#{totalCost}"
+  "#{contentStr}#{discStr}\nTotal cost: $#{totalPrice}"
 end
 
 # remove item with itemId from basket
